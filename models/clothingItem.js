@@ -1,5 +1,6 @@
+const validator = require("validator");
+
 const mongoose = require("mongoose");
-import validator from "validator";
 
 const clothingItemSchema = new mongoose.Schema({
   name: {
@@ -11,7 +12,7 @@ const clothingItemSchema = new mongoose.Schema({
   weather: {
     type: String,
     required: true,
-    enum: [hot, warm, cold],
+    enum: ["hot", "warm", "cold"],
   },
   imageUrl: {
     type: String,
@@ -34,7 +35,8 @@ const clothingItemSchema = new mongoose.Schema({
     },
   ],
   createdAt: {
-    type: Date.now,
+    type: Date,
+    value: Date.now(),
   },
 });
 
