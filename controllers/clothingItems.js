@@ -1,5 +1,6 @@
 const ClothingItems = require("../models/clothingItem");
 const { isValidUrl } = require("../utils/url");
+const mongoose = require("mongoose");
 
 module.exports.getItems = (req, res) => {
   ClothingItems.find({})
@@ -43,19 +44,25 @@ module.exports.createClothingItem = (req, res) => {
 };
 
 module.exports.removeItems = (req, res) => {
-  ClothingItems.findByIdAndRemove(req.params.id)
-    .orFail(() => {
-      const error = new Error("Item ID not found");
-      error.statusCode = 400;
-      throw error;
-    })
-    .then((item) => {
-      return res.status(200).send({ data: item });
-    })
-    .catch((err) => {
-      const ERROR_CODE = 404;
-      if (err.name === "Error") {
-        return res.status(ERROR_CODE).send({ message: "Item ID not found" });
-      }
-    });
+  if (mongoose.Types.ObjectId.isValid(req.params.itemId) === false) {
+    return res.status(404).send({ message: `Not valid ID` });
+  } else {
+    ClothingItems.findByIdAndRemove(req.params.itemId)
+      .then((item) => {
+        return res.status(200).send({ data: item });
+      })
+      .catch((err) => {
+        console.log(err);
+        //   console.log(req.params);
+        //   console.log(err.name);
+        const ERROR_CODE = 404;
+        if (err.name === "DocumentNotFoundError") {
+          return res.status(ERROR_CODE).send({ message: "Item ID not found" });
+        } else if (err.name === "CastError") {
+          res.status(400).send({ message: `Not a valid ID` });
+        } else {
+          res.status(404).send({ message: `Not found` });
+        }
+      });
+  }
 };

@@ -8,15 +8,18 @@ module.exports.likeItem = (req, res) => {
     },
     { new: true }
   )
+    .orFail()
     .then((user) => {
       return res.status(200).send({ data: user });
     })
     .catch((err) => {
-      const ERROR_CODE = 400;
-      if (err.name === "CastError") {
+      const ERROR_CODE = 404;
+      if (err.name === "DocumentNotFoundError") {
         return res
           .status(ERROR_CODE)
           .send({ message: "Item with ID not found" });
+      } else if (err.name === "CastError") {
+        return res.status(400).send({ message: "Item with ID not found" });
       }
     });
 };
@@ -29,15 +32,18 @@ module.exports.dislikeItem = (req, res) => {
     },
     { new: true }
   )
+    .orFail()
     .then((user) => {
       return res.status(200).send({ data: user });
     })
     .catch((err) => {
-      const ERROR_CODE = 400;
-      if (err.name === "CastError") {
+      const ERROR_CODE = 404;
+      if (err.name === "DocumentNotFoundError") {
         return res
           .status(ERROR_CODE)
           .send({ message: "Item with ID not found" });
+      } else if (err.name === "CastError") {
+        return res.status(400).send({ message: "Item with ID not found" });
       }
     });
 };
