@@ -17,5 +17,13 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/", router);
+app.use((req, res, next) => {
+  const statusCode = 404;
+
+  const message = `Requested resource not found`;
+
+  res.status(statusCode).send({ message });
+  next();
+});
 
 app.listen(PORT);
