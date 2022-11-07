@@ -7,7 +7,7 @@
         "allow": ["_id"]
       }
     ],
-    "consistent-return": "off",
-    "prettier/prettier": ["error", { "singleQuote": true }]
-  }
+    "consistent-return": "off"
+  },
+  "plugins": ["eslint-plugin-prettier"]
 }
