@@ -45,23 +45,19 @@ module.exports.createClothingItem = (req, res) => {
 
 module.exports.removeItems = (req, res) => {
   if (mongoose.Types.ObjectId.isValid(req.params.itemId) === false) {
-    return res.status(404).send({ message: `Not valid ID` });
+    return res.status(400).send({ message: `Not valid ID` });
   } else {
     ClothingItems.findByIdAndRemove(req.params.itemId)
+      .orFail(() => {
+        return res.status(404).send({ message: "Item ID not found" });
+      })
       .then((item) => {
         return res.status(200).send({ data: item });
       })
       .catch((err) => {
-        console.log(err);
-        //   console.log(req.params);
-        //   console.log(err.name);
         const ERROR_CODE = 404;
         if (err.name === "DocumentNotFoundError") {
           return res.status(ERROR_CODE).send({ message: "Item ID not found" });
-        } else if (err.name === "CastError") {
-          res.status(400).send({ message: `Not a valid ID` });
-        } else {
-          res.status(404).send({ message: `Not found` });
         }
       });
   }
