@@ -1,50 +1,64 @@
-const mongoose = require('mongoose');
-const User = require('../models/user');
-const { isValidUrl } = require('../utils/url');
+const mongoose = require("mongoose");
+const User = require("../models/user");
+const { isValidUrl } = require("../utils/url");
+const {
+  badRequest,
+  serverError,
+  notFoundError,
+  successOk,
+  createdOk,
+} = require("../utils/errors");
 
 module.exports.getUser = (req, res) => {
   if (mongoose.Types.ObjectId.isValid(req.params.userId) === false) {
-    return res.status(400).send({ message: 'Not valid user ID' });
+    return res.status(badRequest).send({ message: "Not valid user ID" });
   }
   User.findById(req.params.userId)
     .orFail()
-    .then((user) => res.status(200).send({ data: user }))
+    .then((user) => res.status(successOk).send({ data: user }))
     .catch((err) => {
-      const ERROR_CODE = 404;
-      if (err.name === 'DocumentNotFoundError') {
+      if (err.name === "DocumentNotFoundError") {
         return res
-          .status(ERROR_CODE)
-          .send({ message: 'Requested resource not found' });
+          .status(notFoundError)
+          .send({ message: "Requested resource not found" });
+      } else if (err.name === "CastError") {
+        return res
+          .status(badRequest)
+          .send({ message: `Invalid ID was passed` });
+      } else {
+        return res
+          .status(serverError)
+          .send({ message: `An error has occured on the server` });
       }
     });
 };
 
 module.exports.getUsers = (req, res) => {
   User.find({})
-    .then((users) => res.status(200).send([{ data: users }]))
-    .catch((err) => {
-      const ERROR_CODE = 500;
-      if (err.name === 'InternalServerError') {
-        return res
-          .status(ERROR_CODE)
-          .send({ message: 'An error has occured on the server' });
-      }
+    .then((users) => res.status(successOk).send([{ data: users }]))
+    .catch(() => {
+      return res
+        .status(serverError)
+        .send({ message: "An error has occured on the server" });
     });
 };
 
 module.exports.createUser = (req, res) => {
   const { name, avatar } = req.body;
   if (!isValidUrl(avatar)) {
-    return res.status(400).send({ message: 'Not a valid URL' });
+    return res.status(badRequest).send({ message: "Not a valid URL" });
   }
   User.create({ name, avatar })
-    .then((user) => res.status(201).send({ data: user }))
+    .then((user) => res.status(createdOk).send({ data: user }))
     .catch((err) => {
-      const ERROR_CODE = 400;
-      if (err.name === 'ValidationError') {
+      if (err.name === "ValidationError") {
         return res
-          .status(ERROR_CODE)
-          .send({ message: 'User validation failed' });
+          .status(badRequest)
+          .send({ message: "User validation failed" });
+      } else {
+        return res
+          .status(serverError)
+          .send({ message: `An error has occured on the server` });
       }
     });
 };

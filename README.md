@@ -1,6 +1,12 @@
-# WTWR (What to Wear?): Back End
-The back-end project is focused on creating a server for the WTWR application. You’ll gain a deeper understanding of how to work with databases, set up security and testing, and deploy web applications on a remote machine. The eventual goal is to create a server with an API and user authorization.
-## Running the Project
-`npm run start` — to launch the server 
+# Project 12: WTWR Project Backend
 
-`npm run dev` — to launch the server with the hot reload feature
+What to wear is a weather application that generates clothing items for users based on weather forcasts throughout various geographical locations. This project involves the backend development of WTWR.
+
+## Technologies used
+
+[![My Skills](https://skillicons.dev/icons?i=js,nodejs,express,mongodb)](https://skillicons.dev)
+
+### Future implementations:
+
+- User Authorization using middleware
+- Deploy web app on a remote machine

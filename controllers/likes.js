@@ -1,4 +1,10 @@
-const ClothingItems = require('../models/clothingItem');
+const ClothingItems = require("../models/clothingItem");
+const {
+  badRequest,
+  serverError,
+  notFoundError,
+  successOk,
+} = require("../utils/errors");
 
 module.exports.likeItem = (req, res) => {
   ClothingItems.findByIdAndUpdate(
@@ -6,18 +12,24 @@ module.exports.likeItem = (req, res) => {
     {
       $addToSet: { likes: req.user._id },
     },
-    { new: true },
+    { new: true }
   )
     .orFail()
-    .then((user) => res.status(200).send({ data: user }))
+    .then((user) => res.status(successOk).send({ data: user }))
     .catch((err) => {
-      const ERROR_CODE = 404;
-      if (err.name === 'DocumentNotFoundError') {
+      if (err.name === "DocumentNotFoundError") {
         return res
-          .status(ERROR_CODE)
-          .send({ message: 'Item with ID not found' });
-      } if (err.name === 'CastError') {
-        return res.status(400).send({ message: 'Item with ID not found' });
+          .status(notFoundError)
+          .send({ message: "Item with ID not found" });
+      }
+      if (err.name === "CastError") {
+        return res
+          .status(badRequest)
+          .send({ message: "Invalid ID was passed" });
+      } else {
+        return res
+          .status(serverError)
+          .send({ message: `An error has occured on the server` });
       }
     });
 };
@@ -28,18 +40,22 @@ module.exports.dislikeItem = (req, res) => {
     {
       $pull: { likes: req.user._id },
     },
-    { new: true },
+    { new: true }
   )
     .orFail()
-    .then((user) => res.status(200).send({ data: user }))
+    .then((user) => res.status(successOk).send({ data: user }))
     .catch((err) => {
-      const ERROR_CODE = 404;
-      if (err.name === 'DocumentNotFoundError') {
+      if (err.name === "DocumentNotFoundError") {
         return res
-          .status(ERROR_CODE)
-          .send({ message: 'Item with ID not found' });
-      } if (err.name === 'CastError') {
-        return res.status(400).send({ message: 'Item with ID not found' });
+          .status(notFoundError)
+          .send({ message: "Item with ID not found" });
+      }
+      if (err.name === "CastError") {
+        return res.status(400).send({ message: "Invalid ID was passed" });
+      } else {
+        return res
+          .status(serverError)
+          .send({ message: `An error has occured on the server` });
       }
     });
 };

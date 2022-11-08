@@ -8,6 +8,5 @@
       }
     ],
     "consistent-return": "off"
-  },
-  "plugins": ["eslint-plugin-prettier"]
+  }
 }
