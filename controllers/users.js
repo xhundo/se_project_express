@@ -1,34 +1,35 @@
-const mongoose = require("mongoose");
-const User = require("../models/user");
-const { isValidUrl } = require("../utils/url");
+const mongoose = require('mongoose');
+const User = require('../models/user');
+const { isValidUrl } = require('../utils/url');
 const {
   badRequest,
   serverError,
   notFoundError,
   successOk,
   createdOk,
-} = require("../utils/errors");
+} = require('../utils/errors');
+const e = require('express');
 
 module.exports.getUser = (req, res) => {
   if (mongoose.Types.ObjectId.isValid(req.params.userId) === false) {
-    return res.status(badRequest).send({ message: "Not valid user ID" });
+    return res.status(badRequest).send({ message: 'Not valid user ID' });
   }
   User.findById(req.params.userId)
     .orFail()
     .then((user) => res.status(successOk).send({ data: user }))
     .catch((err) => {
-      if (err.name === "DocumentNotFoundError") {
+      if (err.name === 'DocumentNotFoundError') {
         return res
           .status(notFoundError)
-          .send({ message: "Requested resource not found" });
-      } else if (err.name === "CastError") {
+          .send({ message: 'Requested resource not found' });
+      } else if (err.name === 'CastError') {
         return res
           .status(badRequest)
-          .send({ message: `Invalid ID was passed` });
+          .send({ message: 'Invalid ID was passed' });
       } else {
         return res
           .status(serverError)
-          .send({ message: `An error has occured on the server` });
+          .send({ message: 'An error has occured on the server' });
       }
     });
 };
@@ -36,29 +37,29 @@ module.exports.getUser = (req, res) => {
 module.exports.getUsers = (req, res) => {
   User.find({})
     .then((users) => res.status(successOk).send([{ data: users }]))
-    .catch(() => {
-      return res
+    .catch(() =>
+      res
         .status(serverError)
-        .send({ message: "An error has occured on the server" });
-    });
+        .send({ message: 'An error has occured on the server' })
+    );
 };
 
 module.exports.createUser = (req, res) => {
   const { name, avatar } = req.body;
   if (!isValidUrl(avatar)) {
-    return res.status(badRequest).send({ message: "Not a valid URL" });
+    return res.status(badRequest).send({ message: 'Not a valid URL' });
   }
   User.create({ name, avatar })
     .then((user) => res.status(createdOk).send({ data: user }))
     .catch((err) => {
-      if (err.name === "ValidationError") {
+      if (err.name === 'ValidationError') {
         return res
           .status(badRequest)
-          .send({ message: "User validation failed" });
+          .send({ message: 'User validation failed' });
       } else {
         return res
           .status(serverError)
-          .send({ message: `An error has occured on the server` });
+          .send({ message: 'An error has occured on the server' });
       }
     });
 };
