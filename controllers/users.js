@@ -8,7 +8,6 @@ const {
   successOk,
   createdOk,
 } = require('../utils/errors');
-const e = require('express');
 
 module.exports.getUser = (req, res) => {
   if (mongoose.Types.ObjectId.isValid(req.params.userId) === false) {
@@ -22,26 +21,25 @@ module.exports.getUser = (req, res) => {
         return res
           .status(notFoundError)
           .send({ message: 'Requested resource not found' });
-      } else if (err.name === 'CastError') {
+      }
+      if (err.name === 'CastError') {
         return res
           .status(badRequest)
           .send({ message: 'Invalid ID was passed' });
-      } else {
-        return res
-          .status(serverError)
-          .send({ message: 'An error has occured on the server' });
       }
+
+      return res
+        .status(serverError)
+        .send({ message: 'An error has occured on the server' });
     });
 };
 
 module.exports.getUsers = (req, res) => {
   User.find({})
     .then((users) => res.status(successOk).send([{ data: users }]))
-    .catch(() =>
-      res
-        .status(serverError)
-        .send({ message: 'An error has occured on the server' })
-    );
+    .catch(() => res
+      .status(serverError)
+      .send({ message: 'An error has occured on the server' }));
 };
 
 module.exports.createUser = (req, res) => {
@@ -56,10 +54,10 @@ module.exports.createUser = (req, res) => {
         return res
           .status(badRequest)
           .send({ message: 'User validation failed' });
-      } else {
-        return res
-          .status(serverError)
-          .send({ message: 'An error has occured on the server' });
       }
+
+      return res
+        .status(serverError)
+        .send({ message: 'An error has occured on the server' });
     });
 };

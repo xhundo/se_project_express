@@ -12,11 +12,11 @@ const {
 module.exports.getItems = (req, res) => {
   ClothingItems.find({})
     .then((items) => res.send([{ data: items }]))
-    .catch(() =>
+    .catch(() => {
       res
         .status(serverError)
-        .send({ message: 'An error has occured on the server' })
-    );
+        .send({ message: 'An error has occured on the server' });
+    });
 };
 
 module.exports.createClothingItem = (req, res) => {
@@ -40,11 +40,11 @@ module.exports.createClothingItem = (req, res) => {
         return res
           .status(badRequest)
           .send({ message: 'Item validation failed' });
-      } else {
-        return res
-          .status(serverError)
-          .send({ message: 'An error has occured on the server' });
       }
+
+      return res
+        .status(serverError)
+        .send({ message: 'An error has occured on the server' });
     });
 };
 
@@ -58,14 +58,14 @@ module.exports.removeItems = (req, res) => {
     .catch((err) => {
       if (err.name === 'DocumentNotFoundError') {
         return res.status(notFoundError).send({ message: 'Item ID not found' });
-      } else if (err.name === 'CastError') {
+      }
+      if (err.name === 'CastError') {
         return res
           .status(badRequest)
           .send({ message: 'Invalid ID was passed' });
-      } else {
-        return res
-          .status(serverError)
-          .send({ message: 'An error has occured on the server' });
       }
+      return res
+        .status(serverError)
+        .send({ message: 'An error has occured on the server' });
     });
 };

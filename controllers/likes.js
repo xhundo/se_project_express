@@ -12,7 +12,7 @@ module.exports.likeItem = (req, res) => {
     {
       $addToSet: { likes: req.user._id },
     },
-    { new: true }
+    { new: true },
   )
     .orFail()
     .then((user) => res.status(successOk).send({ data: user }))
@@ -21,15 +21,16 @@ module.exports.likeItem = (req, res) => {
         return res
           .status(notFoundError)
           .send({ message: 'Item with ID not found' });
-      } else if (err.name === 'CastError') {
+      }
+      if (err.name === 'CastError') {
         return res
           .status(badRequest)
           .send({ message: 'Invalid ID was passed' });
-      } else {
-        return res
-          .status(serverError)
-          .send({ message: 'An error has occured on the server' });
       }
+
+      return res
+        .status(serverError)
+        .send({ message: 'An error has occured on the server' });
     });
 };
 
@@ -39,7 +40,7 @@ module.exports.dislikeItem = (req, res) => {
     {
       $pull: { likes: req.user._id },
     },
-    { new: true }
+    { new: true },
   )
     .orFail()
     .then((user) => res.status(successOk).send({ data: user }))
@@ -48,12 +49,13 @@ module.exports.dislikeItem = (req, res) => {
         return res
           .status(notFoundError)
           .send({ message: 'Item with ID not found' });
-      } else if (err.name === 'CastError') {
-        return res.status(400).send({ message: 'Invalid ID was passed' });
-      } else {
-        return res
-          .status(serverError)
-          .send({ message: 'An error has occured on the server' });
       }
+      if (err.name === 'CastError') {
+        return res.status(400).send({ message: 'Invalid ID was passed' });
+      }
+
+      return res
+        .status(serverError)
+        .send({ message: 'An error has occured on the server' });
     });
 };
