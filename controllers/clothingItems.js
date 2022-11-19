@@ -7,6 +7,7 @@ const {
   notFoundError,
   successOk,
   createdOk,
+  forbiddenError,
 } = require('../utils/errors');
 
 module.exports.getItems = (req, res) => {
@@ -51,6 +52,9 @@ module.exports.createClothingItem = (req, res) => {
 module.exports.removeItems = (req, res) => {
   if (mongoose.Types.ObjectId.isValid(req.params.itemId) === false) {
     return res.status(badRequest).send({ message: 'Not valid ID' });
+  }
+  if (req.user._id !== req.params.id) {
+    return res.status(forbiddenError).send({ message: 'User not authorized' });
   }
   ClothingItems.findByIdAndRemove(req.params.itemId)
     .orFail()

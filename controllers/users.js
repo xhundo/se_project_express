@@ -1,4 +1,6 @@
 const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const { isValidUrl } = require('../utils/url');
 const {
@@ -7,7 +9,10 @@ const {
   notFoundError,
   successOk,
   createdOk,
+  conflictError,
+  authError,
 } = require('../utils/errors');
+const { JWT_SECRET } = require('../utils/config');
 
 module.exports.getUser = (req, res) => {
   if (mongoose.Types.ObjectId.isValid(req.params.userId) === false) {
@@ -37,25 +42,89 @@ module.exports.getUser = (req, res) => {
 module.exports.getUsers = (req, res) => {
   User.find({})
     .then((users) => res.status(successOk).send([{ data: users }]))
-    .catch(() => res
-      .status(serverError)
-      .send({ message: 'An error has occured on the server' }));
+    .catch(() => res.status(serverError).send({ message: 'An error has occured on the server' }));
 };
 
 module.exports.createUser = (req, res) => {
-  const { name, avatar } = req.body;
+  const {
+    name, avatar, email, password,
+  } = req.body;
   if (!isValidUrl(avatar)) {
     return res.status(badRequest).send({ message: 'Not a valid URL' });
   }
-  User.create({ name, avatar })
-    .then((user) => res.status(createdOk).send({ data: user }))
+  User.findOne({ email }).then((user) => {
+    if (!user) {
+      return res
+        .status(conflictError)
+        .send({ message: 'Email already exists' });
+    }
+
+    bcrypt.hash(password, 10).then((hash) => {
+      User.create({
+        name, avatar, email, password: hash,
+      })
+        .then(() => res.status(createdOk).send({ data: user }))
+        .catch((err) => {
+          if (err.name === 'ValidationError') {
+            return res
+              .status(badRequest)
+              .send({ message: 'User validation failed' });
+          }
+
+          return res
+            .status(serverError)
+            .send({ message: 'An error has occured on the server' });
+        });
+    });
+  });
+};
+
+module.exports.login = (req, res) => {
+  const { email, password } = req.body;
+
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
+        expiresIn: '7d',
+      });
+      res.send({ token });
+    })
+    .catch(() => res.status(authError).send({ message: 'Invalid email or password' }));
+};
+
+module.exports.getCurrentUser = (req, res) => {
+  User.findById(req.user._id).then((user) => res.status(successOk).send({ data: user }));
+};
+
+module.exports.updateUser = (req, res) => {
+  const {
+    name, avatar, email, password,
+  } = req.body;
+
+  User.findByIdupdate(
+    req.user._id,
+    {
+      name,
+      avatar,
+      email,
+      password,
+    },
+    {
+      new: true,
+      runValidators: true,
+    },
+  )
+    .then((user) => res.status(successOk).send({ data: user }))
     .catch((err) => {
+      if (err.name === 'NotFoundError') {
+        return res.status(notFoundError).send({ message: 'User not found' });
+      }
+
       if (err.name === 'ValidationError') {
         return res
           .status(badRequest)
           .send({ message: 'User validation failed' });
       }
-
       return res
         .status(serverError)
         .send({ message: 'An error has occured on the server' });
