@@ -20,7 +20,7 @@ module.exports.getUser = (req, res) => {
   }
   User.findById(req.params.userId)
     .orFail()
-    .then((user) => res.status(successOk).send({ data: user }))
+    .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.name === 'DocumentNotFoundError') {
         return res
@@ -42,7 +42,9 @@ module.exports.getUser = (req, res) => {
 module.exports.getUsers = (req, res) => {
   User.find({})
     .then((users) => res.status(successOk).send([{ data: users }]))
-    .catch(() => res.status(serverError).send({ message: 'An error has occured on the server' }));
+    .catch(() => res
+      .status(serverError)
+      .send({ message: 'An error has occured on the server' }));
 };
 
 module.exports.createUser = (req, res) => {
@@ -53,18 +55,23 @@ module.exports.createUser = (req, res) => {
     return res.status(badRequest).send({ message: 'Not a valid URL' });
   }
   User.findOne({ email }).then((user) => {
-    if (!user) {
+    if (user) {
       return res
         .status(conflictError)
         .send({ message: 'Email already exists' });
     }
 
-    bcrypt.hash(password, 10).then((hash) => {
+    bcrypt.hash(password, 10).then(() => {
       User.create({
-        name, avatar, email, password: hash,
+        name,
+        avatar,
+        email,
       })
         .then(() => res.status(createdOk).send({ data: user }))
         .catch((err) => {
+          if (err.code === 11000) {
+            res.status(conflictError).send({ message: 'Email already exist' });
+          }
           if (err.name === 'ValidationError') {
             return res
               .status(badRequest)
@@ -93,7 +100,21 @@ module.exports.login = (req, res) => {
 };
 
 module.exports.getCurrentUser = (req, res) => {
-  User.findById(req.user._id).then((user) => res.status(successOk).send({ data: user }));
+  User.findById(req.user._id)
+    .then((user) => res.status(successOk).send({ data: user }))
+    .catch((err) => {
+      if (err.name === 'NotFoundError') {
+        return res.status(notFoundError).send({ message: 'User not found' });
+      }
+      if (err.name === 'ValidationError') {
+        return res
+          .status(badRequest)
+          .send({ message: 'User validation failed' });
+      }
+      return res
+        .status(serverError)
+        .send({ message: 'An error has occured on the server' });
+    });
 };
 
 module.exports.updateUser = (req, res) => {
@@ -101,7 +122,7 @@ module.exports.updateUser = (req, res) => {
     name, avatar, email, password,
   } = req.body;
 
-  User.findByIdupdate(
+  User.findByIdAndUpdate(
     req.user._id,
     {
       name,

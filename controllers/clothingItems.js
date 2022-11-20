@@ -5,7 +5,6 @@ const {
   badRequest,
   serverError,
   notFoundError,
-  successOk,
   createdOk,
   forbiddenError,
 } = require('../utils/errors');
@@ -50,15 +49,20 @@ module.exports.createClothingItem = (req, res) => {
 };
 
 module.exports.removeItems = (req, res) => {
+  const { id } = req.params;
   if (mongoose.Types.ObjectId.isValid(req.params.itemId) === false) {
     return res.status(badRequest).send({ message: 'Not valid ID' });
   }
-  if (req.user._id !== req.params.id) {
-    return res.status(forbiddenError).send({ message: 'User not authorized' });
-  }
-  ClothingItems.findByIdAndRemove(req.params.itemId)
+  ClothingItems.findById(id)
     .orFail()
-    .then((item) => res.status(successOk).send({ data: item }))
+    .then((item) => {
+      if (!item.owner.equals(req.user._id)) {
+        return res
+          .status(forbiddenError)
+          .send({ message: 'User not authorized' });
+      }
+      return item.remove().then(() => res.send({ data: item }));
+    })
     .catch((err) => {
       if (err.name === 'DocumentNotFoundError') {
         return res.status(notFoundError).send({ message: 'Item ID not found' });

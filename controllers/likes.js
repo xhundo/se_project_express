@@ -51,7 +51,9 @@ module.exports.dislikeItem = (req, res) => {
           .send({ message: 'Item with ID not found' });
       }
       if (err.name === 'CastError') {
-        return res.status(400).send({ message: 'Invalid ID was passed' });
+        return res
+          .status(badRequest)
+          .send({ message: 'Invalid ID was passed' });
       }
 
       return res

@@ -1,15 +1,15 @@
-const { jwt } = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
 const { authError } = require('../utils/errors');
 const { JWT_SECRET } = require('../utils/config');
 
 module.exports = (req, res, next) => {
   const { authorization } = req.headers;
 
-  if (!authorization || authorization.startsWith('Bearer ')) {
+  if (!authorization || !authorization.startsWith('Bearer ')) {
     return res.status(authError).send({ message: 'Authorization required' });
   }
   {
-    const token = authorization.replace('Bearer', ' ');
+    const token = authorization.replace('Bearer ', '');
 
     let payload;
 
