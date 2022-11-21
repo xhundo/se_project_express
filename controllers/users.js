@@ -61,16 +61,17 @@ module.exports.createUser = (req, res) => {
         .send({ message: 'Email already exists' });
     }
 
-    bcrypt.hash(password, 10).then(() => {
+    bcrypt.hash(password, 10).then((hash) => {
       User.create({
         name,
         avatar,
         email,
+        password: hash,
       })
-        .then(() => res.status(createdOk).send({ data: user }))
+        .then(() => res.status(createdOk).send({ name, avatar, email }))
         .catch((err) => {
           if (err.code === 11000) {
-            res.status(conflictError).send({ message: 'Email already exist' });
+            return res.status(conflictError).send({ message: 'Email already exist' });
           }
           if (err.name === 'ValidationError') {
             return res

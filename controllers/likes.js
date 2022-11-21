@@ -8,7 +8,7 @@ const {
 
 module.exports.likeItem = (req, res) => {
   ClothingItems.findByIdAndUpdate(
-    req.params.itemId,
+    req.params.id,
     {
       $addToSet: { likes: req.user._id },
     },
@@ -36,7 +36,7 @@ module.exports.likeItem = (req, res) => {
 
 module.exports.dislikeItem = (req, res) => {
   ClothingItems.findByIdAndUpdate(
-    req.params.itemId,
+    req.params.id,
     {
       $pull: { likes: req.user._id },
     },

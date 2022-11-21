@@ -50,7 +50,7 @@ module.exports.createClothingItem = (req, res) => {
 
 module.exports.removeItems = (req, res) => {
   const { id } = req.params;
-  if (mongoose.Types.ObjectId.isValid(req.params.itemId) === false) {
+  if (mongoose.Types.ObjectId.isValid(req.params.id) === false) {
     return res.status(badRequest).send({ message: 'Not valid ID' });
   }
   ClothingItems.findById(id)
