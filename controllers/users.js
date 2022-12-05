@@ -42,18 +42,18 @@ module.exports.getUser = (req, res) => {
 module.exports.getUsers = (req, res) => {
   User.find({})
     .then((users) => res.status(successOk).send([{ data: users }]))
-    .catch(() => res
-      .status(serverError)
-      .send({ message: 'An error has occured on the server' }));
+    .catch(() =>
+      res
+        .status(serverError)
+        .send({ message: 'An error has occured on the server' }),
+    );
 };
 
 module.exports.createUser = (req, res) => {
-  const {
-    name, avatar, email, password,
-  } = req.body;
-  if (!isValidUrl(avatar)) {
-    return res.status(badRequest).send({ message: 'Not a valid URL' });
-  }
+  const { name, avatar, email, password } = req.body;
+  // if (!isValidUrl(avatar)) {
+  //   return res.status(badRequest).send({ message: 'Not a valid URL' });
+  // }
   User.findOne({ email }).then((user) => {
     if (user) {
       return res
@@ -71,7 +71,9 @@ module.exports.createUser = (req, res) => {
         .then(() => res.status(createdOk).send({ name, avatar, email }))
         .catch((err) => {
           if (err.code === 11000) {
-            return res.status(conflictError).send({ message: 'Email already exist' });
+            return res
+              .status(conflictError)
+              .send({ message: 'Email already exist' });
           }
           if (err.name === 'ValidationError') {
             return res
@@ -97,7 +99,9 @@ module.exports.login = (req, res) => {
       });
       res.send({ token });
     })
-    .catch(() => res.status(authError).send({ message: 'Invalid email or password' }));
+    .catch(() =>
+      res.status(authError).send({ message: 'Invalid email or password' }),
+    );
 };
 
 module.exports.getCurrentUser = (req, res) => {
@@ -119,17 +123,13 @@ module.exports.getCurrentUser = (req, res) => {
 };
 
 module.exports.updateUser = (req, res) => {
-  const {
-    name, avatar, email, password,
-  } = req.body;
+  const { name, avatar } = req.body;
 
   User.findByIdAndUpdate(
     req.user._id,
     {
       name,
       avatar,
-      email,
-      password,
     },
     {
       new: true,

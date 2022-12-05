@@ -22,9 +22,9 @@ module.exports.getItems = (req, res) => {
 module.exports.createClothingItem = (req, res) => {
   const { name, weather, imageUrl } = req.body;
   const owner = req.user._id;
-  if (!isValidUrl(imageUrl)) {
-    return res.status(badRequest).send({ message: 'Url invalid' });
-  }
+  // if (!isValidUrl(imageUrl)) {
+  //   return res.status(badRequest).send({ message: 'Url invalid' });
+  // }
   if (!weather) {
     return res.status(badRequest).send({ message: 'Weather is required' });
   }
