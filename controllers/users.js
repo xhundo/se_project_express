@@ -3,10 +3,10 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 // const { isValidUrl } = require('../utils/url');
-const { successOk, createdOk, conflictError } = require('../errors/errors');
+const { successOk, createdOk } = require('../errors/errors');
 const NotFoundError = require('../errors/NotFoundError');
 // const { JWT_SECRET } = require('../utils/config');
-const AuthError = require('../errors/authError');
+const AuthError = require('../errors/AuthError');
 const ValidationError = require('../errors/ValidationError');
 const ConflictError = require('../errors/ConflictError');
 
