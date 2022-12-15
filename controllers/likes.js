@@ -1,12 +1,9 @@
 const ClothingItems = require('../models/clothingItem');
-const {
-  badRequest,
-  serverError,
-  notFoundError,
-  successOk,
-} = require('../utils/errors');
+const { successOk } = require('../errors/errors');
+const NotFoundError = require('../errors/NotFoundError');
+const ValidationError = require('../errors/ValidationError');
 
-module.exports.likeItem = (req, res) => {
+module.exports.likeItem = (req, res, next) => {
   ClothingItems.findByIdAndUpdate(
     req.params.itemId,
     {
@@ -18,23 +15,17 @@ module.exports.likeItem = (req, res) => {
     .then((user) => res.status(successOk).send({ data: user }))
     .catch((err) => {
       if (err.name === 'DocumentNotFoundError') {
-        return res
-          .status(notFoundError)
-          .send({ message: 'Item with ID not found' });
+        next(new NotFoundError('Item with ID not found'));
       }
       if (err.name === 'CastError') {
-        return res
-          .status(badRequest)
-          .send({ message: 'Invalid ID was passed' });
+        next(new ValidationError('Invalid ID was passed'));
       }
 
-      return res
-        .status(serverError)
-        .send({ message: 'An error has occured on the server' });
+      next(err);
     });
 };
 
-module.exports.dislikeItem = (req, res) => {
+module.exports.dislikeItem = (req, res, next) => {
   ClothingItems.findByIdAndUpdate(
     req.params.itemId,
     {
@@ -46,18 +37,12 @@ module.exports.dislikeItem = (req, res) => {
     .then((user) => res.status(successOk).send({ data: user }))
     .catch((err) => {
       if (err.name === 'DocumentNotFoundError') {
-        return res
-          .status(notFoundError)
-          .send({ message: 'Item with ID not found' });
+        next(new NotFoundError('Item with ID not found'));
       }
       if (err.name === 'CastError') {
-        return res
-          .status(badRequest)
-          .send({ message: 'Invalid ID was passed' });
+        next(new ValidationError('Invalid ID was passed'));
       }
 
-      return res
-        .status(serverError)
-        .send({ message: 'An error has occured on the server' });
+      next(err);
     });
 };

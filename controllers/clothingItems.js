@@ -7,26 +7,24 @@ const {
   notFoundError,
   createdOk,
   forbiddenError,
-} = require('../utils/errors');
+} = require('../errors/errors');
+const ValidationError = require('../errors/ValidationError');
+const NotFoundError = require('../errors/NotFoundError');
 
-module.exports.getItems = (req, res) => {
+module.exports.getItems = (req, res, next) => {
   ClothingItems.find({})
     .then((items) => res.send([{ data: items }]))
-    .catch(() => {
-      res
-        .status(serverError)
-        .send({ message: 'An error has occured on the server' });
-    });
+    .catch((err) => next(err));
 };
 
-module.exports.createClothingItem = (req, res) => {
+module.exports.createClothingItem = (req, res, next) => {
   const { name, weather, imageUrl } = req.body;
   const owner = req.user._id;
   // if (!isValidUrl(imageUrl)) {
   //   return res.status(badRequest).send({ message: 'Url invalid' });
   // }
   if (!weather) {
-    return res.status(badRequest).send({ message: 'Weather is required' });
+    throw new ValidationError('Weather is required');
   }
   ClothingItems.create({
     name,
@@ -37,21 +35,17 @@ module.exports.createClothingItem = (req, res) => {
     .then((item) => res.status(createdOk).send({ data: item }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return res
-          .status(badRequest)
-          .send({ message: 'Item validation failed' });
+        next(new ValidationError('Item validation failed'));
       }
 
-      return res
-        .status(serverError)
-        .send({ message: 'An error has occured on the server' });
+      next(err);
     });
 };
 
-module.exports.removeItems = (req, res) => {
+module.exports.removeItems = (req, res, next) => {
   const { id } = req.params;
   if (mongoose.Types.ObjectId.isValid(req.params.id) === false) {
-    return res.status(badRequest).send({ message: 'Not valid ID' });
+    throw new ValidationError('Not valid ID');
   }
   ClothingItems.findById(id)
     .orFail()
@@ -65,15 +59,11 @@ module.exports.removeItems = (req, res) => {
     })
     .catch((err) => {
       if (err.name === 'DocumentNotFoundError') {
-        return res.status(notFoundError).send({ message: 'Item ID not found' });
+        next(new NotFoundError('Item ID not found'));
       }
       if (err.name === 'CastError') {
-        return res
-          .status(badRequest)
-          .send({ message: 'Invalid ID was passed' });
+        next(new ValidationError('Invalid ID was passed'));
       }
-      return res
-        .status(serverError)
-        .send({ message: 'An error has occured on the server' });
+      next(err);
     });
 };
