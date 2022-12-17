@@ -7,7 +7,7 @@ const auth = require('./middlewares/auth');
 const router = require('./routes');
 const cors = require('cors');
 const app = express();
-const { PORT = 3001 } = process.env;
+const { PORT = 3000 } = process.env;
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const { validateURL } = require('./utils/validator');
 mongoose.connect('mongodb://localhost:27017/wtwr_db');
