@@ -11,3 +11,11 @@ What to wear is a weather application that generates clothing items for users ba
 - User Authorization using middleware
 - Deploy web app on a remote machine
 - User Authentication using JSON web tokens.
+
+### Live Website
+
+(https://www.wtwr-demo.students.nomoredomainssbs.ru)
+
+### Backend API
+
+https://api.wtwr-demo.students.nomoredomainssbs.ru

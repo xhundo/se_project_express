@@ -36,7 +36,9 @@ module.exports.getUsers = (req, res, next) => {
 };
 
 module.exports.createUser = (req, res, next) => {
-  const { name, avatar, email, password } = req.body;
+  const {
+    name, avatar, email, password,
+  } = req.body;
   // if (!isValidUrl(avatar)) {
   //   return res.status(badRequest).send({ message: 'Not a valid URL' });
   // }

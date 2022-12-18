@@ -1,15 +1,19 @@
 const express = require('express');
 const mongoose = require('mongoose');
 require('dotenv').config();
-const { login, createUser } = require('./controllers/users');
 const { errors, celebrate, Joi } = require('celebrate');
-const auth = require('./middlewares/auth');
-const router = require('./routes');
 const cors = require('cors');
+const { login, createUser } = require('./controllers/users');
+const auth = require('./middlewares/auth');
+
+const router = require('./routes');
+
 const app = express();
 const { PORT = 3000 } = process.env;
+const { errorHandle } = require('./errors/errors');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const { validateURL } = require('./utils/validator');
+
 mongoose.connect('mongodb://localhost:27017/wtwr_db');
 
 app.use(express.json());
@@ -17,7 +21,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 app.options('*', cors());
 app.use(requestLogger);
-console.log(process.env.NODE_ENV);
+
 app.get('/crash-test', () => {
   setTimeout(() => {
     throw new Error('Server will crash now');
@@ -28,7 +32,9 @@ app.post(
   '/signin',
   celebrate({
     body: Joi.object().keys({
-      email: Joi.string().required(),
+      email: Joi.string()
+        .required()
+        .email({ tlds: { allow: false } }),
       password: Joi.string().required().min(9),
     }),
   }),
@@ -38,9 +44,11 @@ app.post(
   '/signup',
   celebrate({
     body: Joi.object().keys({
-      email: Joi.string().required(),
+      email: Joi.string()
+        .required()
+        .email({ tlds: { allow: false } }),
       password: Joi.string().required().min(9),
-      name: Joi.string().required().min(2),
+      name: Joi.string().min(2),
       avatar: Joi.string().allow('').custom(validateURL),
     }),
   }),
@@ -60,12 +68,6 @@ app.use(errorLogger);
 
 app.use(errors());
 
-app.use((err, req, res, next) => {
-  const { statusCode = 500, message } = err;
-  return res.status(statusCode).send({
-    message:
-      statusCode === 500 ? 'An error has occured on the server' : message,
-  });
-});
+app.use(errorHandle());
 
 app.listen(PORT);

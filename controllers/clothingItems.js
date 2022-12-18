@@ -1,13 +1,7 @@
 const mongoose = require('mongoose');
 const ClothingItems = require('../models/clothingItem');
-const { isValidUrl } = require('../utils/url');
-const {
-  badRequest,
-  serverError,
-  notFoundError,
-  createdOk,
-  forbiddenError,
-} = require('../errors/errors');
+// const { isValidUrl } = require('../utils/url');
+const { createdOk, forbiddenError } = require('../errors/errors');
 const ValidationError = require('../errors/ValidationError');
 const NotFoundError = require('../errors/NotFoundError');
 
