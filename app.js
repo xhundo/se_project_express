@@ -3,12 +3,16 @@ const mongoose = require('mongoose');
 require('dotenv').config();
 const { errors, celebrate, Joi } = require('celebrate');
 const cors = require('cors');
+
 const { login, createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
 
 const router = require('./routes');
 
 const app = express();
+
+app.options('*', cors());
+
 const { PORT = 3000 } = process.env;
 const { errorHandle } = require('./errors/errors');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
@@ -19,7 +23,6 @@ mongoose.connect('mongodb://localhost:27017/wtwr_db');
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cors());
-app.options('*', cors());
 app.use(requestLogger);
 
 app.get('/crash-test', () => {
