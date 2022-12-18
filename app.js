@@ -18,9 +18,6 @@ const { validateURL } = require('./utils/validator');
 
 mongoose.connect('mongodb://localhost:27017/wtwr_db');
 
-app.use(cors());
-app.options('*', cors());
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
