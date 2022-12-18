@@ -11,9 +11,9 @@ const router = require('./routes');
 
 const app = express();
 
-app.use(cors());
-
 app.options('*', cors());
+
+app.use(cors());
 
 const { PORT = 3000 } = process.env;
 const { errorHandle } = require('./errors/errors');
