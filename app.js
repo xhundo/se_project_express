@@ -15,9 +15,9 @@ const optionsCors = {
   origin: 'https://www.wtwr-demo.students.nomoredomainssbs.ru',
 };
 
-app.use(cors(optionsCors.origin));
+// app.use(cors(optionsCors.origin));
 
-app.options('*', cors(optionsCors.origin));
+// app.options('*', cors(optionsCors.origin));
 
 const { PORT = 3000 } = process.env;
 const { errorHandle } = require('./errors/errors');
