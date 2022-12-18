@@ -11,13 +11,9 @@ const router = require('./routes');
 
 const app = express();
 
-const optionsCors = {
-  origin: 'https://www.wtwr-demo.students.nomoredomainssbs.ru',
-};
+app.use(cors());
 
-// app.use(cors(optionsCors.origin));
-
-// app.options('*', cors(optionsCors.origin));
+app.options('*', cors());
 
 const { PORT = 3000 } = process.env;
 const { errorHandle } = require('./errors/errors');
