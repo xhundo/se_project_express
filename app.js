@@ -71,8 +71,9 @@ app.post(
 app.use(limiter);
 
 app.use('/', router);
-app.use(auth, (err) => {
+app.use(auth, (err, next) => {
   NotFoundError(err.message);
+  next();
 });
 
 app.use(errorLogger);
