@@ -5,7 +5,7 @@ const { errors, celebrate, Joi } = require('celebrate');
 const cors = require('cors');
 // const rateLimit = require('express-rate-limit');
 const { login, createUser } = require('./controllers/users');
-// const auth = require('./middlewares/auth');
+const auth = require('./middlewares/auth');
 
 const router = require('./routes');
 
