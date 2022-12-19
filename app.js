@@ -10,9 +10,6 @@ const auth = require('./middlewares/auth');
 const router = require('./routes');
 
 const app = express();
-const corOptions = {
-  origin: 'https://www.wtwr-demo.students.nomoredomainssbs.ru/',
-};
 
 const { PORT = 3000 } = process.env;
 const { errorHandle } = require('./errors/errors');
