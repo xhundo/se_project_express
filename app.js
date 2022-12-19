@@ -65,7 +65,7 @@ app.use(limiter);
 
 app.use('/', router);
 app.use(auth, (err, req, res, next) => {
-  next(new NotFoundError(err.message));
+  next(new NotFoundError('Requested resource not found'));
 });
 
 app.use(errorLogger);
