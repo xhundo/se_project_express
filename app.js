@@ -75,6 +75,6 @@ app.use(errorLogger);
 
 app.use(errors());
 
-app.use(errorHandle());
+app.use(errorHandle);
 
 app.listen(PORT);
