@@ -23,7 +23,7 @@ const { validateURL } = require('./utils/validator');
 //   legacyHeaders: true, // Disable the `X-RateLimit-*` headers
 // });
 
-// const NotFoundError = require('./errors/NotFoundError');
+const NotFoundError = require('./errors/NotFoundError');
 
 mongoose.connect('mongodb://localhost:27017/wtwr_db');
 
@@ -71,10 +71,10 @@ app.post(
 // app.use(limiter);
 
 app.use('/', router);
-// app.use(auth, (err, next) => {
-//   NotFoundError(err.message);
-//   next();
-// });
+app.use(auth, (err, next) => {
+  NotFoundError(err.message);
+  next();
+});
 
 app.use(errorLogger);
 
