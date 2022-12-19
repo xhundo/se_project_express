@@ -21,8 +21,8 @@ const { validateURL } = require('./utils/validator');
 
 mongoose.connect('mongodb://localhost:27017/wtwr_db');
 
-app.use(cors(corOptions));
-app.options('*', cors(corOptions));
+app.use(cors());
+app.options('*', cors());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -75,6 +75,12 @@ app.use(errorLogger);
 
 app.use(errors());
 
-app.use(errorHandle);
+app.use((err, req, res, next) => {
+  const { statusCode = 500, message } = err;
+  return res.status(statusCode).send({
+    message:
+      statusCode === 500 ? 'An error has occured on the server' : message,
+  });
+});
 
 app.listen(PORT);
