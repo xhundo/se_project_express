@@ -15,6 +15,8 @@ const { PORT = 3000 } = process.env;
 const { errorHandle } = require('./errors/errors');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const { validateURL } = require('./utils/validator');
+const { limiter } = require('./utils/rateLimit');
+const NotFoundError = require('./errors/NotFoundError');
 
 mongoose.connect('mongodb://localhost:27017/wtwr_db');
 
@@ -58,14 +60,12 @@ app.post(
   }),
   createUser,
 );
+
+app.use(limiter);
+
 app.use('/', router);
-app.use(auth, (req, res, next) => {
-  const statusCode = 404;
-
-  const message = 'Requested resource not found';
-
-  res.status(statusCode).send({ message });
-  next();
+app.use(auth, (err, req, res, next) => {
+  next(new NotFoundError(err.message));
 });
 
 app.use(errorLogger);
