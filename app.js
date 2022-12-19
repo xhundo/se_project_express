@@ -1,9 +1,10 @@
+import rateLimit from 'express-rate-limit';
+
 const express = require('express');
 const mongoose = require('mongoose');
 require('dotenv').config();
 const { errors, celebrate, Joi } = require('celebrate');
 const cors = require('cors');
-const rateLimit = require('express-rate-limit');
 const { login, createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
 
