@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 require('dotenv').config();
 const { errors, celebrate, Joi } = require('celebrate');
 const cors = require('cors');
-
+const rateLimit = require('express-rate-limit');
 const { login, createUser } = require('./controllers/users');
 const auth = require('./middlewares/auth');
 
@@ -15,7 +15,14 @@ const { PORT = 3000 } = process.env;
 const { errorHandle } = require('./errors/errors');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const { validateURL } = require('./utils/validator');
-const { limiter } = require('./utils/rateLimit');
+
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+});
+
 const NotFoundError = require('./errors/NotFoundError');
 
 mongoose.connect('mongodb://localhost:27017/wtwr_db');
