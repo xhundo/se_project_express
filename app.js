@@ -72,9 +72,7 @@ app.post(
   createUser,
 );
 
-app.get('/ip', (req, res) => {
-  res.send(req.ip);
-});
+app.get('/ip', (request, response) => response.send(request.ip));
 
 app.use('/', router);
 app.use(auth, (err, next) => {
