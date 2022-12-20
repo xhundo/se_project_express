@@ -72,11 +72,10 @@ app.post(
   createUser,
 );
 
-app.get('/ip', (request, response) => response.send(request.ip));
-
 app.use('/', router);
-app.use(auth, (err, next) => {
-  NotFoundError(err.message);
+
+app.use(auth, (next) => {
+  NotFoundError('Requested resource not found');
   next();
 });
 
