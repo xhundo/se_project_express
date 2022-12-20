@@ -13,8 +13,6 @@ const router = require('./routes');
 
 const app = express();
 
-app.set('trust proxy', 2);
-
 const { PORT = 3000 } = process.env;
 const { errorHandle } = require('./errors/errors');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
@@ -23,9 +21,11 @@ const { validateURL } = require('./utils/validator');
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
-  standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
-  legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 });
+
+app.set('trust proxy', 2);
+
+app.use(limiter);
 
 const NotFoundError = require('./errors/NotFoundError');
 
@@ -77,8 +77,6 @@ app.use(auth, (err, next) => {
   NotFoundError(err.message);
   next();
 });
-
-app.use(limiter);
 
 app.get('/ip', (req, res) => {
   res.send(req.ip);
