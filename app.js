@@ -1,6 +1,7 @@
 const rateLimit = require('express-rate-limit');
 
 const express = require('express');
+
 const mongoose = require('mongoose');
 require('dotenv').config();
 const { errors, celebrate, Joi } = require('celebrate');
@@ -11,6 +12,8 @@ const auth = require('./middlewares/auth');
 const router = require('./routes');
 
 const app = express();
+
+app.set('trust proxy', 5);
 
 const { PORT = 3000 } = process.env;
 const { errorHandle } = require('./errors/errors');
@@ -77,7 +80,6 @@ app.use(auth, (err, next) => {
 
 app.use(limiter);
 
-app.set('trust proxy', 5);
 app.get('/ip', (req, res) => {
   res.send(req.ip);
 });
