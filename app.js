@@ -77,6 +77,8 @@ app.use(auth, (err, next) => {
 
 app.use(limiter);
 
+app.set('trust proxy');
+
 app.use(errorLogger);
 
 app.use(errors());
