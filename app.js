@@ -1,4 +1,4 @@
-import rateLimit from 'express-rate-limit';
+const rateLimit = require('express-rate-limit');
 
 const express = require('express');
 const mongoose = require('mongoose');
