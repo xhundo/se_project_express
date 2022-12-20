@@ -77,7 +77,10 @@ app.use(auth, (err, next) => {
 
 app.use(limiter);
 
-app.set('trust proxy');
+app.set('trust proxy', 1);
+app.get('/', (req, res) => {
+  res.send(req.ip);
+});
 
 app.use(errorLogger);
 
