@@ -1,5 +1,3 @@
-const rateLimit = require('express-rate-limit').default;
-
 const express = require('express');
 
 const mongoose = require('mongoose');
@@ -18,12 +16,9 @@ const { errorHandle } = require('./errors/errors');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
 const { validateURL } = require('./utils/validator');
 
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
-});
+const limiter = require('./utils/rateLimit');
 
-app.enable('trust proxy');
+app.set('trust proxy');
 
 app.use(limiter);
 
