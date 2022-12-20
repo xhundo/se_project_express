@@ -13,7 +13,7 @@ const router = require('./routes');
 
 const app = express();
 
-app.set('trust proxy', 5);
+app.set('trust proxy', 1);
 
 const { PORT = 3000 } = process.env;
 const { errorHandle } = require('./errors/errors');
