@@ -72,14 +72,14 @@ app.post(
   createUser,
 );
 
+app.get('/ip', (req, res) => {
+  res.send(req.ip);
+});
+
 app.use('/', router);
 app.use(auth, (err, next) => {
   NotFoundError(err.message);
   next();
-});
-
-app.get('/ip', (req, res) => {
-  res.send(req.ip);
 });
 
 app.use(errorLogger);
